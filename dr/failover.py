@@ -36,12 +36,72 @@ LOG = pathlib.Path("reports/failover-events.jsonl")
 
 def emit(**kw):
     """TODO: append 1 dòng JSONL có ts + iso vào LOG, và print ra stdout."""
-    raise NotImplementedError
+    now = time.time()
+    event = {"ts": now, "iso": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(now)), **kw}
+    LOG.parent.mkdir(parents=True, exist_ok=True)
+    with LOG.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(event, ensure_ascii=False) + "\n")
+    print(json.dumps(event, ensure_ascii=False), flush=True)
+    return event
+
+
+def state_of(region: str) -> dict:
+    response = httpx.get(f"{URL[region]}/v1/state", timeout=2.0)
+    response.raise_for_status()
+    return response.json()
 
 
 def failover(target: str, backend: str, wait: float) -> dict:
     """TODO: 5 bước ở trên, đúng thứ tự."""
-    raise NotImplementedError
+    if target not in URL or wait < 0:
+        return {"ok": False, "error": "invalid_arguments"}
+    try:
+        before = state_of(target)
+        emit(step="1_verify_target", target=target, state=before)
+
+        meta = snapshot.get(target, backend)
+        rpo = snapshot.rpo(pathlib.Path("state/region-a/vectors.sqlite"),
+                           pathlib.Path(f"state/region-{target}/vectors.sqlite"))
+        restored = {**meta, **rpo}
+        emit(step="2_restore_snapshot", target=target,
+             rpo_seconds=rpo["rpo_seconds"], docs_lost=rpo["docs_lost"],
+             embed_model_version=meta.get("embed_model_version"),
+             snapshot_at=meta.get("snapshot_at"))
+
+        pool = pathlib.Path(f"state/region-{target}/pool_state")
+        pool.parent.mkdir(parents=True, exist_ok=True)
+        pool.write_text("full\n")
+        emit(step="3_scale_pool", target=target, pool_state="full")
+
+        started = time.monotonic()
+        ready_state = None
+        while time.monotonic() - started <= wait:
+            try:
+                response = httpx.get(f"{URL[target]}/readyz", timeout=min(2.0, max(wait, 0.1)))
+                ready_state = response.json()
+                if response.status_code == 200:
+                    waited = round(time.monotonic() - started, 3)
+                    emit(step="4_wait_ready", target=target, ok=True, waited_s=waited,
+                         state=ready_state)
+                    break
+            except httpx.HTTPError as exc:
+                ready_state = {"error": type(exc).__name__}
+            time.sleep(min(0.5, max(0, wait - (time.monotonic() - started))))
+        else:
+            waited = round(time.monotonic() - started, 3)
+            emit(step="4_wait_ready", target=target, ok=False, waited_s=waited,
+                 error="target_not_ready", state=ready_state)
+            return {"ok": False, "error": "target_not_ready", "target": target,
+                    "state": ready_state, "restore": restored}
+
+        pathlib.Path("edge/active_region").write_text(target + "\n")
+        emit(step="5_dns_cutover", target=target, ok=True)
+        final = state_of(target)
+        return {"ok": True, "target": target, "state": final, "restore": restored,
+                "waited_s": waited, "cutover": target}
+    except (OSError, httpx.HTTPError, ValueError, SystemExit) as exc:
+        emit(step="abort", target=target, ok=False, error=str(exc) or type(exc).__name__)
+        return {"ok": False, "error": str(exc) or type(exc).__name__, "target": target}
 
 
 if __name__ == "__main__":

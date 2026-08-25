@@ -1,0 +1,8 @@
+{"ts": 1787630333.955508, "iso": "2026-08-25T03:58:53", "action": "kill", "region": "a", "mode": "netblock", "backend": "bare", "mock": true, "other_region": "b", "other_alive": true, "forced_both": false, "note": "t_outage_start \u2014 moc 0 cua RTO clock"}
+{"ts": 1787630392.9712892, "iso": "2026-08-25T03:59:52", "action": "restore", "region": "a", "method": "SIGCONT", "pid": 44753}
+{"ts": 1787630421.5871518, "iso": "2026-08-25T04:00:21", "action": "kill", "region": "a", "mode": "netblock", "backend": "bare", "mock": true, "other_region": "b", "other_alive": true, "forced_both": false, "note": "t_outage_start \u2014 moc 0 cua RTO clock"}
+{"ts": 1787630474.261145, "iso": "2026-08-25T04:01:14", "action": "restore", "region": "a", "method": "SIGCONT", "pid": 44753}
+{"ts": 1787630548.966156, "iso": "2026-08-25T04:02:28", "action": "kill", "region": "a", "mode": "netblock", "backend": "bare", "mock": true, "other_region": "b", "other_alive": true, "forced_both": false, "note": "t_outage_start \u2014 moc 0 cua RTO clock"}
+{"ts": 1787630653.2208729, "iso": "2026-08-25T04:04:13", "action": "restore", "region": "a", "method": "SIGCONT", "pid": 44753}
+{"ts": 1787630702.636587, "iso": "2026-08-25T04:05:02", "action": "kill", "region": "a", "mode": "netblock", "backend": "bare", "mock": true, "other_region": "b", "other_alive": true, "forced_both": false, "note": "t_outage_start \u2014 moc 0 cua RTO clock"}
+{"ts": 1787630943.8687072, "iso": "2026-08-25T04:09:03", "action": "restore", "region": "a", "method": "SIGCONT", "pid": 44753}

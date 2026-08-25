@@ -1,0 +1,6 @@
+{"ts": 1787630528.3840199, "region": "b", "event": "state_change", "to": "UNHEALTHY", "reason": "pool_state=warm,model_weights_missing,vector_db_empty(count=0)", "consecutive_fails": 3, "interval_s": 5.0, "threshold": 3}
+{"ts": 1787630565.41552, "region": "a", "event": "state_change", "to": "UNHEALTHY", "reason": "timeout", "consecutive_fails": 3, "interval_s": 5.0, "threshold": 3}
+{"ts": 1787630565.4321039, "region": "b", "event": "state_change", "to": "HEALTHY", "reason": "ready", "consecutive_fails": 0, "interval_s": 5.0, "threshold": 3}
+{"ts": 1787630682.448246, "region": "b", "event": "state_change", "to": "UNHEALTHY", "reason": "pool_state=warm", "consecutive_fails": 3, "interval_s": 5.0, "threshold": 3}
+{"ts": 1787630719.468608, "region": "a", "event": "state_change", "to": "UNHEALTHY", "reason": "timeout", "consecutive_fails": 3, "interval_s": 5.0, "threshold": 3}
+{"ts": 1787630729.489344, "region": "b", "event": "state_change", "to": "HEALTHY", "reason": "ready", "consecutive_fails": 0, "interval_s": 5.0, "threshold": 3}
